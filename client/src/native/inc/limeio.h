@@ -46,7 +46,7 @@ typedef __int64 long64;
 typedef long long           long64;
 #endif
 
-#elif defined(LINUX) || defined(UNIX)
+#elif defined LINUX
 
 #include <sys/types.h>
 #include <stdint.h>

@@ -23,7 +23,6 @@
  */
 
 #include <limeio.h>
-#include <stdlib.h>
 
 /* Socket for receiving event notifications */
 static Socket *socketMon = NULL;

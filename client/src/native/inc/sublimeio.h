@@ -50,13 +50,8 @@ typedef u_int64_t ULONG64;
 #endif /* LONG64_DEFINED */ 
 #endif /* WIN32 */
 
-#ifdef SUBLIME_BUFFER_SIZE
-#define BUFFER_SIZE SUBLIME_BUFFER_SIZE
-#else /* SUBLIME_BUFFER_SIZE */
 /* 8 MB minus 12 bytes for the header length */ 
 #define BUFFER_SIZE 8388596
-#endif /* SUBLIME_BUFFER_SIZE */
-
 /*
  * the data buffer structure: 
  * 0 to 3   : data (only the data!) buffer size (w/o header) (host byte order) 
@@ -74,6 +69,7 @@ typedef struct DataBufferStruct{
 #ifdef WIN32 
 
 typedef struct InternalSharedBufferDataStruct {
+    char* name; 
     DataBuffer* dataBuffer;
     HANDLE hMapFile;
     HANDLE mutex;
@@ -84,6 +80,7 @@ typedef struct InternalSharedBufferDataStruct {
 #else /* !WIN32 */ 
 
 typedef struct InternalSharedBufferDataStruct {
+  char* name; 
   DataBuffer* dataBuffer;
   int* hMapFile;
   pthread_mutex_t *mutex;

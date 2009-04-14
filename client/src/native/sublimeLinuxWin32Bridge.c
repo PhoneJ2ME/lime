@@ -208,10 +208,7 @@ EVENT_HANDLE CreateEvent(void* sa, int manualReset, int initialState, char * nam
     mkfifo(buf, S_IRWXO | S_IRWXU | S_IRWXG );
     
     if ((fd = open(buf, O_RDWR | O_CREAT)) == -1){
-        fprintf(stderr, "error: open failed in CreateEvent\n");
-        fflush(stderr);
-
-        exit(1);
+        error("CreateEvent: open failed\n"); 
     }
     e->pipeDescriptor = fd; 
     e->setEvent = sublime_event_setEvent;

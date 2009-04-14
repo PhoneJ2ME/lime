@@ -223,11 +223,9 @@ static int sharedBuffer_open(SharedBuffer* sb, int size){
 
 
 /* create a new file mapping and open the shared buffer */
-static int sharedBuffer_create(SharedBuffer* sb, char* bufferName){
+static int sharedBuffer_create (SharedBuffer* sb,char* bufferName){
     int size = BUFFER_SIZE; 
     int res; 
-    char* mutexName; 
-
 #ifndef WIN32 
     key_t kt; 
     int shmid, key_id; 
@@ -237,13 +235,10 @@ static int sharedBuffer_create(SharedBuffer* sb, char* bufferName){
 #endif
     assert(sb != NULL);
     assert(bufferName != NULL);
-    
+    sb->data->name = bufferName; 
     sb->data->write_pointer = sb->data->read_pointer = 0;
-
-    mutexName = getMutexName(bufferName);
-    sb->data->mutex = CreateMutex(NULL, FALSE, mutexName);
-    free(mutexName);
-     
+    sb->data->mutex = CreateMutex(NULL,FALSE, 
+                                  (getMutexName(sb->data->name))); 
     if (sb->data->mutex == NULL){
         error("SUBLIMEIO: Could not create mutex ");
         exit(1);    
@@ -284,7 +279,7 @@ static int sharedBuffer_create(SharedBuffer* sb, char* bufferName){
     if ((shmid = shmget(kt, BUFFER_SIZE, IPC_CREAT | 511 )) == -1){
         error("CreateNewSharedBuffer: shmget failed");
     } 
-
+    
     //fprintf(stderr,"shared buffer number is %d  and key is %d\n",shmid, key_id); 
     //fflush(stderr); 
     
@@ -323,18 +318,13 @@ static int sharedBuffer_close(SharedBuffer* sb){
 #else /* !WIN32 */
 
     shmdt(sb->data->dataBuffer); 
-
-    /* 
-     * if we haven't created the shared memory, the following call will fail,
-     * but because it is called by both sides, it will get eventually destroyed
-     */
-    shmctl(*(sb->data->hMapFile), IPC_RMID, NULL);
-
     pthread_mutex_destroy(sb->data->mutex); 
     close(*(sb->data->hMapFile));
 
 #endif /* WIN32 */ 
+    free(sb->data->name); 
     free(sb->data); 
+    sb->data = NULL;
     free(sb); 
     return 0; 
 }
@@ -522,7 +512,8 @@ SharedBuffer* CreateNewSharedBuffer(char* name){
         error("SUBLIMEIO: Could not create Shared Buffer");
         exit(1);    
     }
-    if (sharedBuffer_create(sb, name) != 0){
+    sb->data->name = (char *)strdup(name); 
+    if (sharedBuffer_create(sb,name) != 0){
         error("SUBLIMEIO: Could not create shared buffer");
         fflush(stderr); 
         return NULL; 
@@ -557,6 +548,7 @@ if (sb->data->hMapFile == NULL)  {
     error("SUBLIMEIO: Could not open file mapping object");
     return NULL;
 } 
+sb->data->name = strdup(name); 
 mutexName = getMutexName(name); 
 sb->data->mutex = CreateMutex(NULL,FALSE,mutexName); 
 free(mutexName);

@@ -27,9 +27,6 @@ SPECIFIC_DEFINITIONS+=-I$(LIME_DIR)/client/src/native/inc -I$(JDK_DIR)/include
 SOURCE_OUTPUT_LIST+=$(LIME_DIR)/client lime
 vpath %.c $(LIME_DIR)/client/src/native
 
-ifneq ($(SUBLIME_BUFFER_SIZE), )
-SPECIFIC_DEFINITIONS += -DSUBLIME_BUFFER_SIZE=$(SUBLIME_BUFFER_SIZE)
-endif
 
 ifeq ($(USE_LIME_SHARED),true)
 
